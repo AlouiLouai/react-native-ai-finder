@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, ScrollView, Linking } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View, ScrollView, Linking, SafeAreaView } from 'react-native';
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons'; 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -111,7 +109,6 @@ export default function HomeScreen() {
     }
   };
   
-
   const handleRecordButton = () => {
     if (recording) {
       stopRecording();
@@ -126,26 +123,9 @@ export default function HomeScreen() {
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">{showPlaces ? 'Places Found' : 'Welcome!'}</ThemedText>
-        {showPlaces && (
-          <TouchableOpacity onPress={resetToRecordingView} style={styles.resetButton}>
-            <Text style={styles.resetText}>Go back to Recording</Text>
-          </TouchableOpacity>
-        )}
-        {!showPlaces && <HelloWave />}
-      </ThemedView>
-
+    <SafeAreaView style={styles.container}>
       {!showPlaces ? (
-        <>
+        <View style={styles.mainContainer}>
           <ThemedView style={styles.stepContainer}>
             <ThemedText type="subtitle">Start recording to search places</ThemedText>
           </ThemedView>
@@ -153,66 +133,87 @@ export default function HomeScreen() {
           {/* Record Button */}
           <View style={styles.recordButtonContainer}>
             <TouchableOpacity onPress={handleRecordButton} style={styles.recordButton}>
-              <Ionicons name={recording ? 'stop-circle' : 'mic-circle'} size={80} color="#FF6D5A" />
+              <Ionicons name={recording ? 'stop-circle' : 'mic-circle'} size={150} color="#FF6D5A" />
             </TouchableOpacity>
           </View>
-        </>
+        </View>
       ) : (
-        // Display Places Data
-        <ScrollView style={styles.placesContainer}>
-          {placesData.map((place, index) => (
-            <View key={index} style={styles.card}>
-              <Image source={{ uri: place.image || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
-              <View style={styles.cardContent}>
-                <Text style={styles.cardTitle}>{place.name}</Text>
-                <Text style={styles.cardRating}>Rating: {place.rating}</Text>
-                <Text style={styles.cardAddress}>{place.address}</Text>
-                <Text style={styles.cardWorkingHours}>{place.working_hours}</Text>
+        <ScrollView style={styles.scrollView}>
+          <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title">Places Found</ThemedText>
+            <TouchableOpacity onPress={resetToRecordingView} style={styles.resetButton}>
+              <Text style={styles.resetText}>Go back to Recording</Text>
+            </TouchableOpacity>
+          </ThemedView>
+          
+          {/* Display Places Data */}
+          <View style={styles.placesContainer}>
+            {placesData.map((place, index) => (
+              <View key={index} style={styles.card}>
+                <Image source={{ uri: place.image || 'https://via.placeholder.com/150' }} style={styles.cardImage} />
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{place.name}</Text>
+                  <Text style={styles.cardRating}>Rating: {place.rating}</Text>
+                  <Text style={styles.cardAddress}>{place.address}</Text>
+                  <Text style={styles.cardWorkingHours}>{place.working_hours}</Text>
 
-                <TouchableOpacity
-                  style={styles.directionsButton}
-                  onPress={() => Linking.openURL(place.location_links.directions)}>
-                  <Text style={styles.directionsText}>Get Directions</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.directionsButton}
+                    onPress={() => Linking.openURL(place.location_links.directions)}>
+                    <Text style={styles.directionsText}>Get Directions</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
+          </View>
         </ScrollView>
       )}
-    </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  mainContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingBottom: 50,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 20,
+    paddingHorizontal: 16,
   },
   stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    alignItems: 'center',
+    marginBottom: 60,
   },
   recordButtonContainer: {
     alignItems: 'center',
-    marginTop: 20,
+    justifyContent: 'center',
+    flex: 1,
   },
   recordButton: {
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
   },
 
-  // New Styles for Places Display
+  // Styles for Places Display
   placesContainer: {
     marginTop: 20,
     paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: '#fff',
